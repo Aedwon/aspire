@@ -144,6 +144,13 @@ internal sealed class ResourceCommand : BaseCommand
         var commandArgumentsResult = CreateCommandArguments(command, capturedArguments, loadArguments ? CommandArgumentParseMode.LoadArguments : CommandArgumentParseMode.Execute);
         if (commandArgumentsResult.ErrorMessage is { } errorMessage)
         {
+            if (!loadArguments && command is not null)
+            {
+                InteractionService.DisplayError(errorMessage);
+                ResourceCommandHelpAction.WriteResourceCommandHelp(parseResult.InvocationConfiguration.Output, parseResult.CommandResult, resourceName, command);
+                return CommandResult.FromExitCode(CliExitCodes.InvalidCommand);
+            }
+
             return CommandResult.Failure(CliExitCodes.InvalidCommand, errorMessage);
         }
 
